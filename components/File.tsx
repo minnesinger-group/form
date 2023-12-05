@@ -24,8 +24,8 @@ function buildFileList(files: Array<UploadedFile>): FileList {
   return dataTransfer.files;
 }
 
-function isAcceptedType(accept: Array<string>, type: string): type is string {
-  return accept.some(acceptType => type.match(acceptType));
+function isAcceptedType(accept: Array<string>, type: string | undefined): type is string {
+  return accept.some(acceptType => type?.match(acceptType));
 }
 
 function trimExtension(filename: string): string {
@@ -94,13 +94,8 @@ const FileInput = memo(
       e.preventDefault();
       e.stopPropagation();
       if (e.dataTransfer) {
-        if (isAcceptedType(options.accept, e.dataTransfer.items?.[0]?.type)) {
-          e.dataTransfer.dropEffect = 'copy';
-          addLabelOnDragClass();
-        } else {
-          e.dataTransfer.dropEffect = 'none';
-          removeLabelOnDragClass();
-        }
+        e.dataTransfer.dropEffect = 'copy';
+        addLabelOnDragClass();
       }
     };
 
@@ -132,6 +127,7 @@ const FileInput = memo(
     return (
       <>
         <label
+          class="file-input-root"
           for={id}
           ref={labelRef}
           onDragOver={onDragOver}
