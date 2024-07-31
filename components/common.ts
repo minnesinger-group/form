@@ -3,7 +3,7 @@ import { Ref } from 'preact/hooks';
 import { IsOptional } from '@/extensions/types';
 
 export type ComponentRefType<T> = Ref<{
-  setValue: (value: T) => void;
+  setValue: (value: T) => Promise<void>;
 }>;
 
 type OptionsBlock<O> = IsOptional<O> extends true ? { options?: O } : { options: O };

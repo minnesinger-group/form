@@ -23,7 +23,7 @@ const TextInput = memo(({ setup: { id, onChangeValue, ref } }: RenderableProps<T
   const inputRef = useRef<HTMLInputElement>(null);
 
   useImperativeHandle(ref, () => ({
-    setValue: (value: string | null) => {
+    setValue: async (value: string | null) => {
       if (inputRef.current) {
         inputRef.current.value = value?.toString() ?? '';
         onChange();
@@ -45,7 +45,7 @@ const NumberInput = memo(
     const inputRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => ({
-      setValue: (value: number | null) => {
+      setValue: async (value: number | null) => {
         if (inputRef.current) {
           inputRef.current.value = value?.toString() ?? '';
           onChange();

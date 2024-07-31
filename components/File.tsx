@@ -44,6 +44,7 @@ export type FileInputSetup = ComponentSetup<
 
 export interface FileInputProps {
   setup: FileInputSetup;
+  class?: string;
   onDragClass?: string;
 }
 
@@ -51,6 +52,7 @@ const FileInput = memo(
   ({
     setup: { id, options, onChangeValue, ref },
     onDragClass,
+    class: className,
     children,
   }: RenderableProps<FileInputProps>) => {
     console.log('FileInput: ', id);
@@ -127,7 +129,7 @@ const FileInput = memo(
     return (
       <>
         <label
-          class="file-input-root"
+          class={`file-input-root ${className ? className : ''}`}
           for={id}
           ref={labelRef}
           onDragOver={onDragOver}
