@@ -1,18 +1,18 @@
 import { FunctionComponent } from 'preact';
-import { memo } from 'preact/compat';
+import { HTMLAttributes, memo } from 'preact/compat';
 
 export interface LabelSetup {
   id: string;
 }
 
-export interface LabelProps {
+export interface LabelProps extends HTMLAttributes<HTMLLabelElement> {
   setup: LabelSetup;
 }
 
-const Label: FunctionComponent<LabelProps> = memo(({ setup: { id }, children }) => {
+const Label: FunctionComponent<LabelProps> = memo(({ setup: { id }, children, ...props }) => {
   console.log('Label: ', id);
 
-  return <label for={id}>{children}</label>;
+  return <label for={id} {...props}>{children}</label>;
 });
 
 export default Label;

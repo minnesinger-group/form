@@ -1,5 +1,5 @@
 import { RenderableProps } from 'preact';
-import { memo, useImperativeHandle } from 'preact/compat';
+import { memo, useImperativeHandle, HTMLAttributes } from 'preact/compat';
 import { useRef } from 'preact/hooks';
 
 import { ComponentSetup } from './common';
@@ -10,15 +10,15 @@ export type NumberInputValueType = number | null;
 export type TextInputSetup = ComponentSetup<TextInputValueType, {}>;
 export type NumberInputSetup = ComponentSetup<NumberInputValueType, {}>;
 
-export interface TextInputProps {
+export interface TextInputProps extends HTMLAttributes<HTMLInputElement> {
   setup: TextInputSetup;
 }
 
-export interface NumberInputProps {
+export interface NumberInputProps extends HTMLAttributes<HTMLInputElement> {
   setup: NumberInputSetup;
 }
 
-const TextInput = memo(({ setup: { id, onChangeValue, ref } }: RenderableProps<TextInputProps>) => {
+const TextInput = memo(({ setup: { id, onChangeValue, ref }, ...props }: RenderableProps<TextInputProps>) => {
   console.log('TextInput: ', id);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,11 +36,11 @@ const TextInput = memo(({ setup: { id, onChangeValue, ref } }: RenderableProps<T
     onChangeValue(value);
   };
 
-  return <input id={id} ref={inputRef} type="text" onChange={onChange} />;
+  return <input id={id} ref={inputRef} type="text" onChange={onChange} {...props} />;
 });
 
 const NumberInput = memo(
-  ({ setup: { id, onChangeValue, ref } }: RenderableProps<NumberInputProps>) => {
+  ({ setup: { id, onChangeValue, ref }, ...props }: RenderableProps<NumberInputProps>) => {
     console.log('NumberInput: ', id);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +60,7 @@ const NumberInput = memo(
       onChangeValue(value);
     };
 
-    return <input id={id} ref={inputRef} type="number" onChange={onChange} />;
+    return <input id={id} ref={inputRef} type="number" onChange={onChange} {...props} />;
   },
 );
 
