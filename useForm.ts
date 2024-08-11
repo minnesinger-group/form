@@ -1,4 +1,4 @@
-import { Inputs, useCallback, useMemo, useState } from 'preact/hooks';
+import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import { mapRecord } from '@/extensions/object';
 import { identity } from '@/extensions/functions';
@@ -37,14 +37,12 @@ type FormSetup<C extends FormConfig> = {
   }) => Promise<void>;
 };
 
-const useForm = <C extends FormConfig>(
-  configBuilder: ConfigBuilder<C>,
-  onSubmit: (values: FormValues<C>) => void,
-  inputs: Inputs,
-): FormSetup<C> => {
-  const config = useMemo(() => configBuilder(identity), inputs);
+export function buildFormConfig<C extends FormConfig>(builder: ConfigBuilder<C>): C {
+  return builder(identity);
+}
 
-  const [values, setValues] = useState<FormValues<C>>(mapRecord(config, () => null));
+const useForm = <C extends FormConfig>(config: C, onSubmit: (values: FormValues<C>) => void): FormSetup<C> => {
+  const [values, setValues] = useState(mapRecord<C, FormValues<C>>(config, () => null));
 
   const refs = useComponentRefs(config);
 

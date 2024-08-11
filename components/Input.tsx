@@ -12,13 +12,15 @@ export type NumberInputSetup = ComponentSetup<NumberInputValueType, {}>;
 
 export interface TextInputProps extends HTMLAttributes<HTMLInputElement> {
   setup: TextInputSetup;
+  isValid?: boolean;
 }
 
 export interface NumberInputProps extends HTMLAttributes<HTMLInputElement> {
   setup: NumberInputSetup;
+  isValid?: boolean;
 }
 
-const TextInput = memo(({ setup: { id, onChangeValue, ref }, ...props }: RenderableProps<TextInputProps>) => {
+const TextInput = memo(({ setup: { id, onChangeValue, ref }, isValid, ...props }: RenderableProps<TextInputProps>) => {
   console.log('TextInput: ', id);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,11 +38,20 @@ const TextInput = memo(({ setup: { id, onChangeValue, ref }, ...props }: Rendera
     onChangeValue(value);
   };
 
-  return <input id={id} ref={inputRef} type="text" onChange={onChange} {...props} />;
+  return (
+    <input
+      id={id}
+      ref={inputRef}
+      type="text"
+      onChange={onChange}
+      {...(isValid !== undefined ? { 'data-valid': isValid } : {})}
+      {...props}
+    />
+  );
 });
 
 const NumberInput = memo(
-  ({ setup: { id, onChangeValue, ref }, ...props }: RenderableProps<NumberInputProps>) => {
+  ({ setup: { id, onChangeValue, ref }, isValid, ...props }: RenderableProps<NumberInputProps>) => {
     console.log('NumberInput: ', id);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +71,16 @@ const NumberInput = memo(
       onChangeValue(value);
     };
 
-    return <input id={id} ref={inputRef} type="number" onChange={onChange} {...props} />;
+    return (
+      <input
+        id={id}
+        ref={inputRef}
+        type="number"
+        onChange={onChange}
+        {...(isValid !== undefined ? { 'data-valid': isValid } : {})}
+        {...props}
+      />
+    );
   },
 );
 
