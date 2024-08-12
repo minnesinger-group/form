@@ -8,6 +8,13 @@ export const isNull = <T>(message?: string) =>
     : error(message ?? 'Should be empty', value),
   );
 
+export const isEmpty = (message?: string) =>
+  buildValidator<any, string, string, string>((value: string) =>
+    value.length === 0
+      ? success(value)
+      : error(message ?? 'Should be empty', value),
+  );
+
 export const isNotNull = <T>(message?: string) =>
   buildValidator<any, T | null, T, null>((value: T | null) => value !== null
     ? success(value)
