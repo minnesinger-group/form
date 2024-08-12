@@ -2,14 +2,15 @@ import { Ref } from 'preact/hooks';
 
 import { IsOptional } from '@/extensions/types';
 
-export type ComponentRefType<T> = Ref<{
+export type InputRefType<T> = Ref<{
   setValue: (value: T) => Promise<void>;
+  setValid: (isValid: boolean) => void;
 }>;
 
 type OptionsBlock<O> = IsOptional<O> extends true ? { options?: O } : { options: O };
 
-export type ComponentSetup<VT, O> = {
+export type InputSetup<VT, O> = {
   id: string;
-  ref: ComponentRefType<VT>;
+  ref: InputRefType<VT>;
   onChangeValue: (value: VT) => void;
 } & OptionsBlock<O>;

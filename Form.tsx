@@ -1,10 +1,10 @@
 import { RenderableProps } from 'preact';
 
-import { ComponentValueType } from './components';
+import { InputValueType } from './components';
 import { FormConfig } from './useForm';
 
 export type FormValues<C extends FormConfig> = {
-  [key in keyof C]: ComponentValueType<C[key]['type']>;
+  [key in keyof C]: InputValueType<C[key]['type']>;
 };
 
 export type FormComponentSetup<C extends FormConfig> = {

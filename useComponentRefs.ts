@@ -2,15 +2,22 @@ import { useMemo } from 'preact/hooks';
 
 import { mapRecord } from '@/extensions/object';
 import { FormConfig } from './useForm';
-import { ComponentValueType } from './components';
-import { ComponentRefType } from './components/common';
+import { InputValueType } from './components';
+import { InputRefType } from './components/common';
+import { ErrorHintRefType } from './components/ErrorHint';
 
-type ComponentRefs<C extends FormConfig> = {
-  [key in keyof C]: ComponentRefType<ComponentValueType<C[key]['type']>>;
+export type ComponentRefs<C extends FormConfig> = {
+  [key in keyof C]: {
+    input: InputRefType<InputValueType<C[key]['type']>>,
+    error: ErrorHintRefType,
+  };
 };
 
 const useComponentRefs = <C extends FormConfig>(config: C): ComponentRefs<C> => {
-  return useMemo(() => mapRecord(config, () => ({ current: null })), [config]);
+  return useMemo(() => mapRecord(config, () => ({
+    input: { current: null },
+    error: { current: null },
+  })), [config]);
 };
 
 export default useComponentRefs;

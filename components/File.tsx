@@ -2,7 +2,7 @@ import { RenderableProps } from 'preact';
 import { useRef } from 'preact/hooks';
 import { memo, useImperativeHandle } from 'preact/compat';
 
-import { ComponentSetup } from './common';
+import { InputSetup } from './common';
 
 export interface UploadedFile extends File {
   nameWithoutExtension: string;
@@ -35,7 +35,7 @@ function trimExtension(filename: string): string {
 
 export type FileInputValueType = UploadedFile | null;
 
-export type FileInputSetup = ComponentSetup<
+export type FileInputSetup = InputSetup<
   FileInputValueType,
   {
     accept: Array<string>;
@@ -50,11 +50,11 @@ export interface FileInputProps {
 
 const FileInput = memo(
   ({
-    setup: { id, options, onChangeValue, ref },
-    onDragClass,
-    class: className,
-    children,
-  }: RenderableProps<FileInputProps>) => {
+     setup: { id, options, onChangeValue, ref },
+     onDragClass,
+     class: className,
+     children,
+   }: RenderableProps<FileInputProps>) => {
     console.log('FileInput: ', id);
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -77,6 +77,11 @@ const FileInput = memo(
     useImperativeHandle(ref, () => ({
       setValue: async value => {
         await handleFileList(buildFileList(value ? [value] : []));
+      },
+      setValid: (isValid: boolean) => {
+        if (labelRef.current) {
+          labelRef.current.dataset.valid = `${isValid}`;
+        }
       },
     }));
 
@@ -135,6 +140,7 @@ const FileInput = memo(
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
+          data-valid="true"
         >
           {children}
         </label>

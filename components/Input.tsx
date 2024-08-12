@@ -2,25 +2,23 @@ import { RenderableProps } from 'preact';
 import { memo, useImperativeHandle, HTMLAttributes } from 'preact/compat';
 import { useRef } from 'preact/hooks';
 
-import { ComponentSetup } from './common';
+import { InputSetup } from './common';
 
 export type TextInputValueType = string | null;
 export type NumberInputValueType = number | null;
 
-export type TextInputSetup = ComponentSetup<TextInputValueType, {}>;
-export type NumberInputSetup = ComponentSetup<NumberInputValueType, {}>;
+export type TextInputSetup = InputSetup<TextInputValueType, {}>;
+export type NumberInputSetup = InputSetup<NumberInputValueType, {}>;
 
 export interface TextInputProps extends HTMLAttributes<HTMLInputElement> {
   setup: TextInputSetup;
-  isValid?: boolean;
 }
 
 export interface NumberInputProps extends HTMLAttributes<HTMLInputElement> {
   setup: NumberInputSetup;
-  isValid?: boolean;
 }
 
-const TextInput = memo(({ setup: { id, onChangeValue, ref }, isValid, ...props }: RenderableProps<TextInputProps>) => {
+const TextInput = memo(({ setup: { id, onChangeValue, ref }, ...props }: RenderableProps<TextInputProps>) => {
   console.log('TextInput: ', id);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -31,6 +29,11 @@ const TextInput = memo(({ setup: { id, onChangeValue, ref }, isValid, ...props }
         onChange();
       }
     },
+    setValid: (isValid: boolean) => {
+      if (inputRef.current) {
+        inputRef.current.dataset.valid = `${isValid}`;
+      }
+    },
   }));
 
   const onChange = () => {
@@ -38,20 +41,11 @@ const TextInput = memo(({ setup: { id, onChangeValue, ref }, isValid, ...props }
     onChangeValue(value);
   };
 
-  return (
-    <input
-      id={id}
-      ref={inputRef}
-      type="text"
-      onChange={onChange}
-      {...(isValid !== undefined ? { 'data-valid': isValid } : {})}
-      {...props}
-    />
-  );
+  return <input id={id} ref={inputRef} type="text" onChange={onChange} data-valid="true" {...props} />;
 });
 
 const NumberInput = memo(
-  ({ setup: { id, onChangeValue, ref }, isValid, ...props }: RenderableProps<NumberInputProps>) => {
+  ({ setup: { id, onChangeValue, ref }, ...props }: RenderableProps<NumberInputProps>) => {
     console.log('NumberInput: ', id);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,6 +54,11 @@ const NumberInput = memo(
         if (inputRef.current) {
           inputRef.current.value = value?.toString() ?? '';
           onChange();
+        }
+      },
+      setValid: (isValid: boolean) => {
+        if (inputRef.current) {
+          inputRef.current.dataset.valid = `${isValid}`;
         }
       },
     }));
@@ -71,16 +70,7 @@ const NumberInput = memo(
       onChangeValue(value);
     };
 
-    return (
-      <input
-        id={id}
-        ref={inputRef}
-        type="number"
-        onChange={onChange}
-        {...(isValid !== undefined ? { 'data-valid': isValid } : {})}
-        {...props}
-      />
-    );
+    return <input id={id} ref={inputRef} type="number" onChange={onChange} data-valid="true" {...props} />;
   },
 );
 
