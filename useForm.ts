@@ -22,11 +22,6 @@ type ConfigBuilder<C extends FormConfig> = (
   fn: <T extends InputType>(obj: InputConfigType<T>) => InputConfigType<T>,
 ) => C;
 
-export interface FormValidation<C extends FormConfig, VCS extends ValidatorConfig<C>, VCL extends ValidatorConfig<C>> {
-  submitValidator: Validator<C, VCS>;
-  liveValidator?: Validator<C, VCL>;
-}
-
 type ComponentsSetup<C extends FormConfig> = {
   [key in keyof C]: ComponentSetupType<C[key]['type']>;
 };
@@ -49,16 +44,30 @@ export function buildFormConfig<C extends FormConfig>(builder: ConfigBuilder<C>)
   return builder(identity);
 }
 
+function buildInputId(formId: string | undefined, key: string | number | symbol) {
+  return formId ? `${formId}-${String(key)}` : String(key);
+}
+
 const useForm = <C extends FormConfig, VCS extends ValidatorConfig<C>, VCL extends ValidatorConfig<C>>(
-  config: C,
-  onSubmit: (values: ValidatedObject<C, VCS>) => void,
-  validation?: FormValidation<C, VCS, VCL>,
-): FormSetup<C> => {
+  { id: formId, config, onSubmit, submitValidator, liveValidator }: {
+    id?: string,
+    config: C,
+    onSubmit: (values: ValidatedObject<C, VCS>) => void,
+    submitValidator?: Validator<C, VCS>;
+    liveValidator?: Validator<C, VCL>;
+  }): FormSetup<C> => {
   const [values, setValues] = useState(mapRecord<C, FormValues<C>>(config, () => null));
 
   const refs = useComponentRefs(config);
 
-  const { defaultResults, handleSubmit } = useValidation(config, values, refs, onSubmit, validation);
+  const { defaultResults, handleSubmit } = useValidation(
+    config,
+    values,
+    refs,
+    onSubmit,
+    submitValidator,
+    liveValidator,
+  );
 
   const setFieldValue = useCallback(
     async (id: keyof C, value: InputValueType<C[typeof id]['type']>) => {
@@ -85,12 +94,12 @@ const useForm = <C extends FormConfig, VCS extends ValidatorConfig<C>, VCL exten
       mapRecord(config, (id, record) => ({
         input: {
           options: record.options,
-          id: id.toString(),
+          id: buildInputId(formId, id),
           ref: refs[id].input,
           onChangeValue: (value: InputValueType<C[typeof id]['type']>) =>
             setValues(values => ({ ...values, [id]: value })),
         },
-        label: { id: id.toString() },
+        label: { id: buildInputId(formId, id) },
         error: {
           ref: refs[id].error,
           defaultResult: defaultResults[id],
@@ -100,7 +109,7 @@ const useForm = <C extends FormConfig, VCS extends ValidatorConfig<C>, VCL exten
   );
 
   return {
-    setup: { ...componentsSetup, form: { onSubmit: handleSubmit, values } },
+    setup: { ...componentsSetup, form: { id: formId, onSubmit: handleSubmit, values } },
     values,
     setFieldValue,
     setFieldValues,

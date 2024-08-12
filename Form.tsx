@@ -8,6 +8,7 @@ export type FormValues<C extends FormConfig> = {
 };
 
 export type FormComponentSetup<C extends FormConfig> = {
+  id?: string;
   values: FormValues<C>;
   onSubmit: (values: FormValues<C>) => void;
 };
@@ -17,18 +18,19 @@ interface FormProps<C extends FormConfig> {
   class?: string;
 }
 
-const Form = <C extends FormConfig>({
-  setup: { onSubmit, values },
-  class: className,
-  children,
-}: RenderableProps<FormProps<C>>) => {
+const Form = <C extends FormConfig>(
+  {
+    setup: { id, onSubmit, values },
+    class: className,
+    children,
+  }: RenderableProps<FormProps<C>>) => {
   const handleSubmit = (e: Event) => {
     e.preventDefault();
     onSubmit(values);
   };
 
   return (
-    <form onSubmit={handleSubmit} class={`${className ? className : ''}`}>
+    <form {...id ? { id } : {}} onSubmit={handleSubmit} class={`${className ? className : ''}`}>
       {children}
     </form>
   );

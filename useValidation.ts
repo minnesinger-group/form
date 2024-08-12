@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useMemo } from 'preact/hooks';
 
-import { FormConfig, FormValidation } from './useForm';
+import { FormConfig } from './useForm';
 import { FormValues } from './Form';
 import { ComponentRefs } from './useComponentRefs';
 import { isSuccessResult, resultToObject, ValidatedObject, ValidateResult } from './validation/ValidateResult';
-import { emptyValidator, ValidatorConfig } from './validation/Validator';
+import { emptyValidator, Validator, ValidatorConfig } from './validation/Validator';
 
 const useValidation = <C extends FormConfig, VCS extends ValidatorConfig<C>, VCL extends ValidatorConfig<C>>(
   config: C,
   values: FormValues<C>,
   refs: ComponentRefs<C>,
   onSubmit: (values: ValidatedObject<C, VCS>) => void,
-  validation?: FormValidation<C, VCS, VCL>,
+  submitValidator?: Validator<C, VCS>,
+  liveValidator?: Validator<C, VCL>,
 ) => {
   const defaultResults = useMemo(() => emptyValidator(config)(values), []);
 
@@ -25,8 +26,8 @@ const useValidation = <C extends FormConfig, VCS extends ValidatorConfig<C>, VCL
   };
 
   useEffect(() => {
-    if (validation?.liveValidator) {
-      const newResults = validation.liveValidator(values);
+    if (liveValidator) {
+      const newResults = liveValidator(values);
       setResults(newResults);
     } else {
       setResults(defaultResults);
@@ -34,8 +35,8 @@ const useValidation = <C extends FormConfig, VCS extends ValidatorConfig<C>, VCL
   }, [values]);
 
   const handleSubmit = useCallback((values: ValidatedObject<C, VCS>) => {
-    if (validation?.submitValidator) {
-      const result = validation?.submitValidator(values);
+    if (submitValidator) {
+      const result = submitValidator(values);
       setResults(result);
       if (isSuccessResult(result)) {
         onSubmit(resultToObject(result));
@@ -43,7 +44,7 @@ const useValidation = <C extends FormConfig, VCS extends ValidatorConfig<C>, VCL
     } else {
       onSubmit(values);
     }
-  }, [validation?.submitValidator, onSubmit]);
+  }, [submitValidator, onSubmit]);
 
   return { defaultResults, handleSubmit };
 };
